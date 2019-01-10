@@ -50,7 +50,29 @@ const RegisterRepository = function () {
             return new Promise(function (resolve, reject) {
                 User.findOne({uniqueIndentifier: uniqueIdentifier}, (err, existingUser) => {
                     if (existingUser) {
-                        reject({status: false, message: "Account taken", data:{}});
+                        if (existingUser.accountVerified){
+                            reject({status: false, message: "Account taken", data:{}});
+                        }
+                        else {
+                            const userToken = new UserToken();
+                            userToken.token = generateVerificationCode();
+                            userToken._userId = existingUser._id;
+                            userToken.save(function (error1) {
+                                if (!error1) {
+                                    if (validateEmail(uniqueIdentifier)) {
+                                        EmailRepository.sendEmail(uniqueIdentifier, 'Verfify Account', userToken.token);
+                                    }
+                                    else {
+                                        EmailRepository.sendSms(uniqueIdentifier, userToken.token);
+                                    }
+                                    resolve({status: true, message: "Account Created Successfully", data:{token: userToken.token}});
+                                }
+                                else {
+                                    reject({status: false, message: "Please try again", data:error1});
+                                }
+                            });
+                        }
+
                     }
                     else if (err) {
                         reject({status: false, message: "Something went wrong", data:err});
@@ -71,10 +93,10 @@ const RegisterRepository = function () {
                                 userToken.save(function (error1) {
                                     if (!error1) {
                                         if (validateEmail(uniqueIdentifier)) {
-                                            EmailRepository.sendEmail(uniqueIdentifier, 'Verfify Account', userToken.token);
+                                            // EmailRepository.sendEmail(uniqueIdentifier, 'Verfify Account', userToken.token);
                                         }
                                         else {
-                                            EmailRepository.sendSms(uniqueIdentifier, userToken.token);
+                                            // EmailRepository.sendSms(uniqueIdentifier, userToken.token);
                                         }
                                         resolve({status: true, message: "Account Created Successfully", data:{token: userToken.token}});
                                     }

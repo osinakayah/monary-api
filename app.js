@@ -1,6 +1,7 @@
 // const createError = require('http-errors');
 require('dotenv').config()
 const express = require('express');
+const passport = require('passport');
 const path = require('path');
 // const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -9,6 +10,7 @@ const mongoose   = require('mongoose');
 // const indexRouter = require('./routes/index');
 // const usersRouter = require('./routes/users');
 const v1Authes = require('./modules/authentication/v1/routes');
+const v1DesignRoutes = require('./modules/designs/v1/routes');
 const app = express();
 mongoose.set('useCreateIndex', true);
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
@@ -23,6 +25,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/v1/auth/', v1Authes);
+app.use('/v1/designs/', passport.authenticate("jwt", {session: false}), v1DesignRoutes);
 // app.use(cookieParser());
 // app.use(express.static(path.join(__dirname, 'public')));
 

@@ -37,7 +37,7 @@ const LoginController = function () {
                         data   : user
                     });
                 }
-                req.login(user, {session: false}, (err) => {
+                request.login(user, {session: false}, (err) => {
                     if (err) {
                         return response.status(401).json({
                             status: false,

@@ -24,7 +24,7 @@ passport.use(new LocalStrategy({usernameField: "uniqueIndentifier", passwordFiel
                         if (user.accountVerified) {
                             return cb(undefined, user, {message: "Logged In Successfully"});
                         }
-                        return cb(undefined, false, { message: "Verify Email Account" });
+                        return cb(undefined, false, { message: "Account has not been verified, please register again" });
                     }
                     return cb(undefined, false, { message: "Invalid email or password." });
                 });
